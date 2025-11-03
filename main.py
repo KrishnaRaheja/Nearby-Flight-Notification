@@ -4,6 +4,39 @@ import os
 import requests
 from dotenv import load_dotenv
 
+# WARNING: ASK FOR PERMISSION BEFORE DOING SO WHEN PROPERLY BUILDING
+def get_my_location() -> tuple[float | None, float | None]:
+    """Get user's location from IP address"""
+    try:
+        ip_response = requests.get("http://ip-api.com/json/", timeout=10)
+        ip_data = ip_response.json()
+        print(f"Debug - IP API response: {ip_data}")
+        return ip_data['lat'], ip_data['lon']  # Different keys!
+    except Exception as e:
+        print(f"Error getting location: {e}")
+        return None, None
+
+def calculate_bounding_box(user_lat: float, user_lon: float, radius_km: float) -> dict[str, float]:
+    """Calculate bounding box around a point
+    
+    Args:
+        lat: User latitude
+        lon: User longitude
+        radius_km: Radius in kilometers
+    
+    Returns:
+        Dictionary with lamin, lamax, lomin, lomax
+    """
+    # Approximately 111km per degree of latitude/longitude
+    delta = radius_km / 111.0
+    
+    return {
+        'lamin': user_lat - delta,
+        'lamax': user_lat + delta,
+        'lomin': user_lon - delta,
+        'lomax': user_lon + delta
+    }
+
 # load env variables from .env file
 load_dotenv()
 
@@ -45,13 +78,25 @@ print("Making authenticated request to OpenSky API...")
 # lomax = -122.13 # East boundary (towards Sammamish)
 
 # Greater Seattle area
-lamin = 47.41
-lamax = 47.79
-lomin = -122.48
-lomax = -122.16
+# Get user location
+print("Getting your location...")
+my_lat, my_lon = get_my_location()
+
+if my_lat is None or my_lon is None:
+    print("Could not get location, using default (Seattle)")
+    my_lat, my_lon = 47.61, -122.18
+
+print(f"Central location: {my_lat:.4f}, {my_lon:.4f}")
+
+radius_km = 5  # 5km radius around you
+
+# Calculate bounding box
+bbox = calculate_bounding_box(my_lat, my_lon, radius_km)
+print(f"Searching within a {radius_km}km radius...")
 
 response = requests.get(
-    f"https://opensky-network.org/api/states/all?lamin={lamin}&lamax={lamax}&lomin={lomin}&lomax={lomax}",
+    "https://opensky-network.org/api/states/all",
+    params=bbox,  # Pass the bbox dictionary as params
     headers={"Authorization": f"Bearer {token}"},
     timeout=30
 )
