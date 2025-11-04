@@ -40,17 +40,19 @@ else:
         plane_lat = state[6]
         plane_lon = state[5]
 
-        if plane_lat and plane_lon:  # if either is None, skip, cannot find position anyway
+        if plane_lat and plane_lon: # if either is None, skip, cannot find position anyway
             plane_pos = (plane_lat, plane_lon)
-            dist_km = distance(user_pos, plane_pos).km
-            aircraft_with_distance.append((dist_km, state)) # tuple of (distance, state)
+            dist_to_plane_km = distance(user_pos, plane_pos).km
+            
+            if dist_to_plane_km <= radius_km:  # Only include if dist from plane within radius
+                aircraft_with_distance.append((dist_to_plane_km, state)) # (distance, flight)
 
     # tuples automatically sort by first element (distance)
     aircraft_with_distance.sort(key=lambda x: x[0]) # given x, sort by x[0] (distance)
 
     # Parse and display each aircraft
     print("\n--- Aircraft Details ---")
-    for dist_km, state in aircraft_with_distance:
+    for dist_to_plane_km, state in aircraft_with_distance:
         icao24 = state[0] # Aircraft unique ICAO 24-bit address
         callsign = state[1].strip() if state[1] else "No callsign"  # Flight number
         country = state[2]

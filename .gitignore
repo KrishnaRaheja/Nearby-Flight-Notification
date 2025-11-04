@@ -15,3 +15,5 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 .cache/
+
+data/aircraft-database-complete-2025-08.csv
