@@ -1,24 +1,26 @@
 # Install: pip install python-dotenv
-from src.location import get_my_location, calculate_bounding_box
-from src.opensky import get_token, get_aircraft_in_area
+from geopy.distance import distance
+
+from src.location import calculate_bounding_box, get_my_location
+from src.opensky import get_aircraft_in_area, get_token
 
 # Get token
 token = get_token()
 
 # Get user location
 print("Getting your location...")
-my_lat, my_lon = get_my_location()
+user_lat, user_lon = get_my_location()
 
-if my_lat is None or my_lon is None:
+if user_lat is None or user_lon is None:
     print("Could not get location, using default (Seattle)")
-    my_lat, my_lon = 47.61, -122.33
+    user_lat, user_lon = 47.61, -122.33
 
-print(f"Central location: {my_lat:.4f}, {my_lon:.4f}")
+print(f"Central location: {user_lat:.4f}, {user_lon:.4f}")
 
 radius_km = 5  # 5km radius around you
 
 # Calculate bounding box
-bounding_box = calculate_bounding_box(my_lat, my_lon, radius_km)
+bounding_box = calculate_bounding_box(user_lat, user_lon, radius_km)
 print(f"Searching within a {radius_km}km radius...")
 
 # Get aircraft data
@@ -30,10 +32,25 @@ if data.get('states') is None:
 else:
     print(f"\nFound {len(data['states'])} aircraft in your area!")
 
+    # Using geopy, sort the list by distance to user location
+    user_pos = (user_lat, user_lon)
+    aircraft_with_distance = []
+
+    for state in data['states']:
+        plane_lat = state[6]
+        plane_lon = state[5]
+
+        if plane_lat and plane_lon:  # if either is None, skip, cannot find position anyway
+            plane_pos = (plane_lat, plane_lon)
+            dist_km = distance(user_pos, plane_pos).km
+            aircraft_with_distance.append((dist_km, state)) # tuple of (distance, state)
+
+    # tuples automatically sort by first element (distance)
+    aircraft_with_distance.sort(key=lambda x: x[0]) # given x, sort by x[0] (distance)
+
     # Parse and display each aircraft
     print("\n--- Aircraft Details ---")
-    for state in data['states']:
-        # Extract the fields we care about
+    for dist_km, state in aircraft_with_distance:
         icao24 = state[0] # Aircraft unique ICAO 24-bit address
         callsign = state[1].strip() if state[1] else "No callsign"  # Flight number
         country = state[2]

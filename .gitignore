@@ -1,2 +1,17 @@
 # .gitignore
 .env
+
+__pycache__/
+
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+.DS_Store
+*.egg-info/
+
+.mypy_cache/
+.pytest_cache/
+.cache/
