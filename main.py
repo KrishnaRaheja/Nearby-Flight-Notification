@@ -1,9 +1,34 @@
-# Install: pip install python-dotenv
 from geopy.distance import distance
 
 from src.aircraft_db import AircraftDatabase
 from src.location import calculate_bounding_box, get_my_location
 from src.opensky import get_aircraft_in_area, get_token
+
+from plyer import notification
+
+import json
+
+# Load airline codes
+with open('data/airline_codes.json', 'r') as f:
+    AIRLINE_CODES = json.load(f)
+
+def extract_airline_code(callsign):
+    """Extract airline code from callsign (e.g., 'SWA3491' -> 'SWA')"""
+    if not callsign:
+        return None
+    
+    airline_code = ""
+    for char in callsign:
+        if char.isalpha():
+            airline_code += char
+        else:
+            break
+    
+    return airline_code.upper() if airline_code else None
+
+def get_airline_name(code):
+    """Look up airline name by code"""
+    return AIRLINE_CODES.get(code.upper())
 
 def degrees_to_direction(degrees):
     """Convert degrees (0-360) to compass direction (N, NE, E, etc.)"""
@@ -31,7 +56,7 @@ if user_lat is None or user_lon is None:
 
 print(f"Central location: {user_lat:.4f}, {user_lon:.4f}")
 
-radius_km = 10  # Radius around user (should be set aldready, user can change.)
+radius_km = 50  # Radius around user (should be set aldready, user can change.)
 
 # Calculate bounding box
 bounding_box = calculate_bounding_box(user_lat, user_lon, radius_km)
@@ -98,6 +123,16 @@ else:
         # Look up aircraft in database
         aircraft_info = aircraft_db.lookup(icao24)
         
+        # Determine operator (first try database, then fallback to callsign lookup)
+        operator = None
+        if aircraft_info and aircraft_info['operator']:
+            operator = aircraft_info['operator']
+        else:
+            # Fallback: try to get airline from callsign
+            airline_code = extract_airline_code(callsign)
+            if airline_code:
+                operator = get_airline_name(airline_code)
+        
         # Build Line 1: Model - Operator (only if we have data)
         line1_parts = []
         
@@ -110,20 +145,18 @@ else:
                 line1_parts.append(aircraft_info['model'])
             elif aircraft_info['manufacturer']:
                 line1_parts.append(aircraft_info['manufacturer'])
-            
-            # If operator is availible, put it in the first line as well
-            if aircraft_info['operator']:
-                if line1_parts:
-                    line1 = f"✈️  {line1_parts[0]} - {aircraft_info['operator']}"
-                else:
-                    line1 = f"✈️  {aircraft_info['operator']}"
+        
+        # Build line 1 with operator if available
+        if operator:
+            if line1_parts:
+                line1 = f"✈️  {line1_parts[0]} - {operator}"
             else:
-                if line1_parts:
-                    line1 = f"✈️  {line1_parts[0]}"
-                else:
-                    line1 = f"✈️  {callsign}"
-        else: # If no aircraft info in the lookup, just put the callsign on line 1
-            line1 = f"✈️  {callsign}"
+                line1 = f"✈️  {operator}"
+        else:
+            if line1_parts:
+                line1 = f"✈️  {line1_parts[0]}"
+            else:
+                line1 = f"✈️  {callsign}"
         
         # Build Line 2: Flight details (only include non-None values)
         line2_parts = [f"Flight {callsign}"]
