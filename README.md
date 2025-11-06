@@ -73,15 +73,8 @@ OpenSky Network API limits:
 - **OpenSky Network** for free aviation data API
 - Aircraft database maintained by OpenSky community
 - For user IP address: https://ip-api.com/docs/api:json
+- Notification sound from https://pixabay.com/sound-effects/system-notification-02-352442, Universfield is the author
 
 ## License
 
 GNU General Public License
-
-
-
-
-
-
-notification sound from https://pixabay.com/sound-effects/system-notification-02-352442/
-Universfield is the author
