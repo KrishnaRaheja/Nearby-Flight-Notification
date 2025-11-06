@@ -7,7 +7,7 @@ A Python desktop application that monitors aircraft overhead in real-time and de
 - **Real-time aircraft tracking** using OpenSky Network API
 - **Windows toast notifications** click them for FlightRadar24 tracking
 - **Hybrid data enrichment** combining live ADS-B flight data to match it with aircraft metadata from OpenSky dataset.
-- **Intelligent airline identification** if ADS-B data cannot be matched to OpenSky dataset, reconstruct flight operator (Southwest, Emirates) using first ICAO code in callsign
+- **Intelligent airline identification** if ADS-B data cannot be matched to OpenSky dataset, reconstruct flight operator (Southwest, Emirates) using ICAO code in callsign
 - **Geospatial filtering** using Haversine distance calculations (accurate for earth)
 - **Customizable monitoring radius** (adjustable in system tray)
 
@@ -29,7 +29,28 @@ A Python desktop application that monitors aircraft overhead in real-time and de
 
 ## Project Structure
 ```
-
+C:.
+|   .env
+|   .gitignore
+|   main.py
+|   README.md
+|   
++---assets
+|       system-notification-02-352442.mp3
+|       system-notification-02-wav-format.wav
+|       
++---data
+|       aircraft-database-complete-2025-08.csv
+|       airline_codes.json
+|       
+\---src
+        aircraft_db.py
+        airline_lookup.py
+        helper_funcs.py
+        location.py
+        opensky.py
+        tray.py
+        __init__.py
 ```
 
 ## Technical Details
