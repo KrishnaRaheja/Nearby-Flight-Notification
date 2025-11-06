@@ -5,7 +5,8 @@ import json
 from src.aircraft_db import AircraftDatabase
 from src.location import calculate_bounding_box, get_my_location
 from src.opensky import get_aircraft_in_area, get_token
-from plyer import notification
+from windows_toasts import Toast, InteractableWindowsToaster, ToastButton, ToastDuration
+
 from src.airline_lookup import extract_airline_code, get_airline_name
 from src.helper_funcs import degrees_to_direction
 
@@ -28,7 +29,7 @@ if user_lat is None or user_lon is None:
 
 print(f"Central location: {user_lat:.4f}, {user_lon:.4f}")
 
-radius_km = 50  # Radius around user (can be changed by user)
+radius_km = 5  # Radius around user (can be changed by user)
 print(f"Monitoring for aircraft within {radius_km}km...")
 print("Press Ctrl+C to stop\n")
 
@@ -130,12 +131,19 @@ try:
                             # Build notification message (shorter for Windows)
                             notif_message = f"{callsign} • {altitude_str or 'Unknown alt'} • {dist_to_plane_km:.1f} km"
                             
+
+                            # ------------Replace with toasts
+                            # Show notification with clickable button
                             # Show notification
-                            notification.notify(
-                                title=notif_title,
-                                message=notif_message,
-                                timeout=10
-                            )
+                            toaster = InteractableWindowsToaster('Click to view on FlightRadar24')
+
+                            new_toast = Toast()
+                            new_toast.text_fields = [notif_title, notif_message]
+                            new_toast.launch_action = f'https://www.flightradar24.com/{callsign}'
+                            # Don't even know if this works
+                            new_toast.duration = ToastDuration.Long
+
+                            toaster.show_toast(new_toast)
                             
                             # Print to console too
                             print(f"✈️   {notif_title}")
