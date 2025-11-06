@@ -16,4 +16,5 @@ __pycache__/
 .pytest_cache/
 .cache/
 
+# Ignore dataset, it's too big (100mb +)
 data/aircraft-database-complete-2025-08.csv
