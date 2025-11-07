@@ -91,8 +91,9 @@ OpenSky Network API limits:
 
 ## Credits
 
-- **OpenSky Network** for free aviation data API
-- Aircraft database maintained by OpenSky community
+- **OpenSky Network** for free aviation data API. Register on https://opensky-network.org/ for API.
+- Aircraft database maintained by OpenSky community. Dataset can be found here: https://opensky-network.org/data/scientific
+- For airline ICAO codes: https://en.wikipedia.org/wiki/List_of_airline_codes
 - For user IP address: https://ip-api.com/docs/api:json
 - Notification sound from https://pixabay.com/sound-effects/system-notification-02-352442, Universfield is the author
 

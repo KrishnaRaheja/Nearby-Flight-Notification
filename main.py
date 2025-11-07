@@ -20,7 +20,7 @@ shared_state = {
     'current_aircraft': set()
 }
 
-def monitoring_loop(state, aircraft_db, user_lat, user_lon, token):
+def monitoring_loop(state, aircraft_db, user_lat, user_lon, token, tray_obj):
     """Background monitoring loop"""
     seen_aircraft = set()
     user_pos = (user_lat, user_lon)
@@ -145,6 +145,7 @@ def monitoring_loop(state, aircraft_db, user_lat, user_lon, token):
                                     'display': f"{notif_title} ({callsign})",
                                     'callsign': callsign
                                 })
+                                tray_obj.update_menu()
                                 
                                 # Mark as seen
                                 seen_aircraft.add(icao24)
@@ -183,14 +184,15 @@ print(f"Central location: {user_lat:.4f}, {user_lon:.4f}")
 print(f"Starting with {shared_state['radius_km']}km radius")
 print("System tray icon will appear shortly...\n")
 
+tray = FlightTrackerTray(shared_state)
+
 # Start monitoring in background thread
 monitor_thread = threading.Thread(
     target=monitoring_loop,
-    args=(shared_state, aircraft_db, user_lat, user_lon, token),
+    args=(shared_state, aircraft_db, user_lat, user_lon, token, tray),
     daemon=True  # Thread dies when main program exits
 )
 monitor_thread.start()
 
-# Create and run system tray (blocks until Exit is clicked)
-tray = FlightTrackerTray(shared_state)
+# Blocks until exit clicked
 tray.run()

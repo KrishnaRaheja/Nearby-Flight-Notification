@@ -50,6 +50,7 @@ class FlightTrackerTray:
         # Radius submenu
         radius_items = []
         for r in [1, 2, 5, 8, 10, 15, 20, 30, 40]:  # Options for radius
+            # Add checkmark to radius selected
             label = f"{'✓ ' if self.state['radius_km'] == r else '  '}{r} km"
             radius_items.append(
                 pystray.MenuItem(label, make_radius_handler(self, r))
@@ -82,6 +83,12 @@ class FlightTrackerTray:
         )
         
         return menu
+    
+    def update_menu(self):
+        """Update menu with new state (changes menu whenever flight is 
+        added, not just when tray.run() is called.)"""
+        if self.icon:
+            self.icon.menu= self.create_menu()
 
     def run(self):
         """Start the system tray icon"""
