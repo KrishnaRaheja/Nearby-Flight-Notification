@@ -17,10 +17,25 @@ class FlightTrackerTray:
         self.state = state
         self.icon = None
     
-    def create_icon(self):
+    def create_icon(self, paused=False): # paused set to False at first, changed in run() based on state.
         """Create a simple airplane icon"""
         # Create a 64x64 blue square for now
-        image = Image.new('RGB', (64, 64), color='#1e90ff')
+        bg_color = '#b66f6d' if paused else '#7b9c98'  # Red if paused, green if active
+            
+        # Create image
+        image = Image.new('RGB', (64, 64), color=bg_color)
+        draw = ImageDraw.Draw(image)
+        
+        # Simple shape of airplane
+        # Body of plane
+        draw.rectangle([28, 20, 36, 50], fill='white')
+        # Wings
+        draw.rectangle([10, 28, 54, 36], fill='white')
+        # Tail
+        draw.polygon([28, 20, 36, 20, 32, 12], fill='white')
+        # Tail wings
+        draw.rectangle([24, 18, 40, 22], fill='white')
+        
         return image
     
     def toggle_pause(self, icon, item):
@@ -28,6 +43,9 @@ class FlightTrackerTray:
         self.state['paused'] = not self.state['paused']
         status_str = "paused" if self.state['paused'] else "resumed"
         print(f"\nMonitoring {status_str}")
+        
+        # Update both menu AND icon
+        icon.icon = self.create_icon(self.state['paused'])  # Rebuild icon image to reflect program state
         icon.menu = self.create_menu()  # Rebuild menu to update text
 
     def change_radius(self, icon, item, radius):
@@ -94,7 +112,7 @@ class FlightTrackerTray:
         """Start the system tray icon"""
         self.icon = pystray.Icon(
             'flight_tracker',
-            self.create_icon(),
+            self.create_icon(self.state['paused']), # Passes current state of program (paused/unpaused)
             'Flight Tracker',
             self.create_menu()
         )
