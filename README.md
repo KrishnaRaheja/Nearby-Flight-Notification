@@ -1,5 +1,11 @@
 # Nearby Flight Notification
 
+<p align="center">
+  <img src="screenshots/toast-notif.png" alt="Flight notification" width="500">
+  <br>
+  <em>Get instant notifications when aircraft enter your area</em>
+</p>
+
 A Python desktop application that monitors aircraft overhead in real-time and delivers Windows notifications when planes enter a user-defined radius.
 
 ## Features
@@ -10,6 +16,54 @@ A Python desktop application that monitors aircraft overhead in real-time and de
 - **Intelligent airline identification** if ADS-B data cannot be matched to OpenSky dataset, reconstruct flight operator (Southwest, Emirates) using ICAO code in callsign
 - **Geospatial filtering** using Haversine distance calculations (accurate for earth)
 - **Customizable monitoring radius** (adjustable in system tray)
+
+## Screenshots
+
+### Click to Track on FlightRadar24
+
+Click any notification or recent flight to instantly view live tracking on FlightRadar24:
+
+<p align="center">
+  <img src="screenshots/toast-notif-cropped.png" alt="Notification" width="400">
+  <br>
+  <strong style="font-size: 2.0em; margin: 6px 0; display: inline-block;">↓</strong>
+  <br>
+  <img src="screenshots/flightradar24.png" alt="FlightRadar24 tracking" width="700">
+  <br>
+  <em>Live map, route, and flight details from FlightRadar24</em>
+</p>
+
+### System Tray Menu
+<p align="center">
+  <img src="screenshots/recent-flights.png" alt="System tray menu" width="400">
+  <br>
+  <em>Access recent flights and adjust settings</em>
+</p>
+
+### Radius Selection
+<p align="center">
+  <img src="screenshots/set-radius.png" alt="Radius selection" width="300">
+  <br>
+  <em>Customize your monitoring range from 1-40 km</em>
+</p>
+
+### Status Indicators
+
+The tray icon changes color to show monitoring status:
+
+<p align="center">
+  <img src="screenshots/unpause-program.png" alt="Active monitoring" height="80">
+  <br>
+  <strong>Green</strong> - Active monitoring
+</p>
+
+<div style="margin-top: 20px;"></div>
+
+<p align="center">
+  <img src="screenshots/pause-program.png" alt="Paused" height="80">
+  <br>
+  <strong>Red</strong> - Paused
+</p>
 
 ## How It Works
 
