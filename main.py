@@ -1,5 +1,6 @@
 import threading
 from collections import deque
+import time
 
 from src.aircraft_db import AircraftDatabase
 from src.tray import FlightTrackerTray
@@ -13,11 +14,16 @@ shared_state = {
     'radius_km': 5,
     'tokens_used': 0,
     'recent_flights': deque(maxlen=5),  # Stores only last 5 flights
-    'current_aircraft': set()
+    'current_aircraft': set(),
+    'token': None,
+    'token_expires_at': None
 }
 
 print("=== Flight Tracker Starting ===")
 token = get_token()
+shared_state['token'] = token
+shared_state['token_expires_at'] = time.time() + (1800) # Current time + 30 mins
+
 aircraft_db = AircraftDatabase('data/aircraft-database-complete-2025-08.csv')
 
 # Get user location
@@ -37,7 +43,7 @@ tray = FlightTrackerTray(shared_state)
 # Start monitoring in background thread
 monitor_thread = threading.Thread(
     target=monitoring_loop,
-    args=(shared_state, aircraft_db, user_lat, user_lon, token, tray),
+    args=(shared_state, aircraft_db, user_lat, user_lon, tray),
     daemon=True  # Thread dies when main program exits
 )
 monitor_thread.start()

@@ -7,7 +7,7 @@ from geopy.distance import distance
 import time
 
 
-def monitoring_loop(state, aircraft_db, user_lat, user_lon, token, tray_obj):
+def monitoring_loop(state, aircraft_db, user_lat, user_lon, tray_obj):
     """Background monitoring loop"""
     seen_aircraft = set()
     user_pos = (user_lat, user_lon)
@@ -22,11 +22,19 @@ def monitoring_loop(state, aircraft_db, user_lat, user_lon, token, tray_obj):
                 time.sleep(15)
                 continue
 
+            # Check if token has expired
+            current_time = time.time()
+            if current_time >= state['token_expires_at']:
+                print("\nToken expired (30 minutes passed), refreshing...")
+                state['token'] = get_token()
+                state['token_expires_at'] = time.time() + (1800)
+                print("Token refreshed.\n")
+
             # Calculate bounding box
             bounding_box = calculate_bounding_box(user_lat, user_lon, state['radius_km'])
 
             # Get aircraft data
-            data = get_aircraft_in_area(token, bounding_box)
+            data = get_aircraft_in_area(state['token'], bounding_box)
             state['tokens_used'] += 1
 
             # # Will be None if cannot grab data either, have to think of that

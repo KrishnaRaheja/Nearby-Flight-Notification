@@ -52,11 +52,13 @@ def get_token():
     # Specifies timeout error
     except requests.exceptions.Timeout:
         print("ERROR: Request timed out while getting token")
+        # Later give user option to exit or retry
         sys.exit(1)
 
     # Handles no connection, DNS resolution fails, Network unreachable, and more.
     except requests.exceptions.ConnectionError:
         print("ERROR: Could not connect to OpenSky API (try checking your wifi?)")
+        # Later give user option to exit or retry
         sys.exit(1)
 
     # Different HTTP error handling
@@ -85,7 +87,7 @@ def get_token():
 
 def get_aircraft_in_area(token: str, bbox: dict[str, float]) -> dict[str, list] | None:
     """Get aircraft within a bounding box"""
-    print("Making authenticated request to OpenSky API...")
+    print("\n\nMaking authenticated request to OpenSky API...\n")
 
     try:
         response = requests.get(
@@ -112,7 +114,7 @@ def get_aircraft_in_area(token: str, bbox: dict[str, float]) -> dict[str, list] 
         print(f"WARNING: HTTP error {status}")
 
         if status == 401:
-            print("Token may have expired - you may need to restart the app")
+            print("Token probably expired, try restarting app")
         elif status == 429:
             print("Rate limit exceeded - reduce polling frequency or wait")
         elif status >= 500:
