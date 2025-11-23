@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 
@@ -11,7 +12,8 @@ def get_token():
     CLIENT_SECRET = os.getenv('OPENSKY_CLIENT_SECRET')
 
     if not CLIENT_ID or not CLIENT_SECRET:
-        raise ValueError("Missing OpenSky credentials in .env file")
+        print("ERROR: Missing OpenSky credentials in .env file")
+        sys.exit(1)
 
     print('getting access token...')
 
@@ -40,7 +42,8 @@ def get_token():
         token_data = token_response.json()
 
         if "access_token" not in token_data:
-            raise ValueError("Token response missing access_token field")
+            print("ERROR: Token response missing access_token field")
+            sys.exit(1)
 
         token = token_data["access_token"]
         print(f"Got token: {token[:10]}... (obviously more to this token))")
@@ -49,12 +52,12 @@ def get_token():
     # Specifies timeout error
     except requests.exceptions.Timeout:
         print("ERROR: Request timed out while getting token")
-        raise
+        sys.exit(1)
 
     # Handles no connection, DNS resolution fails, Network unreachable, and more.
     except requests.exceptions.ConnectionError:
-        print("ERROR: Could not connect to OpenSky API")
-        raise
+        print("ERROR: Could not connect to OpenSky API (try checking your wifi?)")
+        sys.exit(1)
 
     # Different HTTP error handling
     except requests.exceptions.HTTPError as e:
@@ -73,12 +76,12 @@ def get_token():
             print("OpenSky service temporarily unavailable")
         else:
             print(f"Unexpected error code: {status}")
-        raise
+        sys.exit(1)
 
     # All unhandled exceptoins
     except Exception as e:
         print(f"ERROR: Unexpected error getting token: {e}")
-        raise
+        sys.exit(1)
 
 def get_aircraft_in_area(token: str, bbox: dict[str, float]) -> dict[str, list] | None:
     """Get aircraft within a bounding box"""
